@@ -789,11 +789,17 @@
       clearInterval(state.timerInterval);
       state.timerInterval = setInterval(() => {
         if (!state.timerRunning) return;
-        if (state.secondsLeft > 0) {
-          state.secondsLeft -= 1;
-          updateTimerUI();
-        } else {
-          state.timerRunning = false;
+  if (state.secondsLeft <= 0) {
+  clearInterval(state.timerInterval);
+  state.timerRunning = false;
+
+  // 🔔 SOM DE ALERTA
+  const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+  audio.play();
+
+  // 🔔 ALERTA VISUAL
+  alert("Bloco finalizado! Bora descansar ou próximo round 👊");
+}
           clearInterval(state.timerInterval);
           updateTimerUI();
           alert('Tempo encerrado. Bora marcar o bloco como feito e seguir o baile.');
