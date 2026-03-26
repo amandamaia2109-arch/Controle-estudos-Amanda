@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Estudos MP/MG</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #142033;
+      --muted: #61708a;
+      --primary: #1f5eff;
+      --primary-soft: #e8efff;
+      --border: #dce4f0;
+      --success: #149c5a;
+      --success-soft: #e8f8ef;
+      --warning: #ffb020;
+      --shadow: 0 10px 30px rgba(20, 32, 51, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 8px;
+      font-size: 15px;
+    }
+
+    .badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card-title {
+      margin: 0 0 16px;
+      font-size: 22px;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    select, input, textarea, button {
+      font: inherit;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: #fff;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat-box {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .progress-wrap {
+      margin-bottom: 18px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: #ebf0f8;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--primary), #5f8dff);
+      transition: width 0.3s ease;
+    }
+
+    .block-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .block {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .block.done {
+      background: var(--success-soft);
+      border-color: #bae8cf;
+    }
+
+    .block-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .mini-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .mini-badge {
+      border: 1px solid var(--border);
+      background: #f8fbff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .block h3 {
+      margin: 4px 0;
+      font-size: 20px;
+    }
+
+    .block p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 14px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: #ffe9e9;
+      color: #b42318;
+      border: 1px solid #ffd0d0;
+    }
+
+    .timer-box {
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      background: #fff;
+    }
+
+    .timer-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .timer {
+      font-size: 56px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin: 10px 0;
+    }
+
+    .timer-subject {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .rules {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+      margin-bottom: 16px;
+    }
+
+    .rules h3 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    .rules ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 24px 0 16px;
+    }
+
+    .tab-btn {
+      background: white;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .grid-4, .grid-3, .grid-2 {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+    .simple-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .list-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .highlight {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(31, 94, 255, 0.08);
+    }
+
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+      .stats { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 16px; }
+      h1 { font-size: 28px; }
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .button-row { grid-template-columns: 1fr; }
+      .timer { font-size: 42px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Painel de Estudos — MP/MG</h1>
+        <div class="subtitle">Cronograma inteligente, pomodoro flexível e blocos sempre vinculados à matéria. Agora sem frescura de React bravo.</div>
+      </div>
+      <div class="badges">
+        <div class="badge" id="todayBadge"></div>
+        <div class="badge" id="rotationBadge"></div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="card">
+        <div class="top-row">
+          <h2 class="card-title">Planejamento do dia</h2>
+          <div style="width: 220px; max-width: 100%;">
+            <select id="daySelect"></select>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat-box">
+            <div class="stat-label">Carga do dia</div>
+            <div class="stat-value" id="totalMinutes"></div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Concluído</div>
+            <div class="stat-value" id="completedMinutes"></div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Meta semanal</div>
+            <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+              <input id="weekGoal" type="number" value="32" style="width:100px;" />
+              <span class="small">horas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-top">
+            <span>Progresso do dia</span>
+            <span id="progressLabel">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <div class="block-list" id="blockList"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Pomodoro</h2>
+        <div class="timer-box">
+          <div class="timer-label">Timer atual</div>
+          <div class="timer" id="timerDisplay">00:00</div>
+          <div class="timer-subject" id="timerSubject">Escolha um bloco para começar</div>
+        </div>
+
+        <div class="button-row">
+          <button class="btn-secondary" id="pauseBtn">Pausar</button>
+          <button class="btn-secondary" id="resumeBtn">Retomar</button>
+          <button class="btn-secondary" id="resetBtn">Resetar</button>
+        </div>
+
+        <div class="rules">
+          <h3>Regras do seu sistema</h3>
+          <ul>
+            <li>Sempre vincular lei seca, revisão, informativos ou questões à matéria do bloco.</li>
+            <li>Lei penal especial entra forte na segunda e sábado, e conectada na quarta.</li>
+            <li>Domingo tem só 2 horas: informativos + revisão leve.</li>
+          </ul>
+        </div>
+
+        <button class="btn-danger" style="width:100%;" id="clearBtn">Limpar progresso do dia</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="rotacao">Rotação</button>
+      <button class="tab-btn" data-tab="pesos">Pesos</button>
+      <button class="tab-btn" data-tab="anotacoes">Anotações</button>
+      <button class="tab-btn" data-tab="estrategia">Estratégia</button>
+    </div>
+
+    <div class="tab-content active" id="tab-rotacao">
+      <div class="grid-4" id="rotationGrid"></div>
+      <div class="card" style="margin-top:16px;">
+        <h2 class="card-title">Rotação ativa agora</h2>
+        <div class="badges" id="currentRotation"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-pesos">
+      <div class="card">
+        <h2 class="card-title">Matérias por prioridade</h2>
+        <div class="grid-3" id="weightsGrid"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-anotacoes">
+      <div class="card">
+        <h2 class="card-title">Anotações do dia</h2>
+        <textarea id="notes" placeholder="Ex.: hoje errei bastante nulidades no CPP; revisar amanhã com 10 questões."></textarea>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-estrategia">
+      <div class="grid-2">
+        <div class="card">
+          <h2 class="card-title">Proporção ideal</h2>
+          <div class="simple-list">
+            <div class="list-item"><span>50% teoria vinculada à matéria</span></div>
+            <div class="list-item"><span>20% jurisprudência / informativos vinculados</span></div>
+            <div class="list-item"><span>20% lei seca vinculada</span></div>
+            <div class="list-item"><span>10% revisão vinculada</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Regra de execução</h2>
+          <div class="simple-list">
+            <div class="list-item"><span>Questões sempre vinculadas à matéria do dia.</span></div>
+            <div class="list-item"><span>Lei penal especial com peso 4 e rotação semanal.</span></div>
+            <div class="list-item"><span>Sábado é consolidação pesada; domingo é manutenção leve.</span></div>
+            <div class="list-item"><span>Nada de “lei seca genérica”: sempre matéria + lei correspondente.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const weeklyPlan = {
+      segunda: [
+        { duration: 120, subject: "Direito Penal", mode: "Teoria + CP + Lei Penal Especial" },
+        { duration: 120, subject: "Direito Processual Penal", mode: "Teoria + CPP" },
+        { duration: 60, subject: "Direito Penal / Processo Penal", mode: "Questões vinculadas" },
+        { duration: 30, subject: "Informativos Penais", mode: "Jurisprudência vinculada" },
+        { duration: 30, subject: "Revisão Penal", mode: "Revisão vinculada" },
+      ],
+      terca: [
+        { duration: 120, subject: "Direito Constitucional", mode: "Teoria + CF" },
+        { duration: 120, subject: "Direito Administrativo", mode: "Teoria + Leis Administrativas" },
+        { duration: 60, subject: "Constitucional / Administrativo", mode: "Questões vinculadas" },
+        { duration: 30, subject: "Informativos STF", mode: "Jurisprudência vinculada" },
+        { duration: 30, subject: "Revisão Constitucional / Administrativo", mode: "Revisão vinculada" },
+      ],
+      quarta: [
+        { duration: 120, subject: "Direito Processual Coletivo", mode: "Teoria + Microssistema Coletivo" },
+        { duration: 120, subject: "Improbidade Administrativa", mode: "Teoria + ACP + conexão com leis especiais" },
+        { duration: 60, subject: "Processo Coletivo / Improbidade", mode: "Questões vinculadas" },
+        { duration: 30, subject: "Informativos de Coletivo / Patrimônio Público", mode: "Jurisprudência vinculada" },
+        { duration: 30, subject: "Revisão Coletiva", mode: "Revisão vinculada" },
+      ],
+      quinta: [
+        { duration: 120, subject: "Direito Civil", mode: "Teoria + Código Civil" },
+        { duration: 120, subject: "Direito Processual Civil", mode: "Teoria + CPC" },
+        { duration: 60, subject: "Civil / Processo Civil", mode: "Questões vinculadas" },
+        { duration: 30, subject: "Informativos Cíveis", mode: "Jurisprudência vinculada" },
+        { duration: 30, subject: "Revisão Civil", mode: "Revisão vinculada" },
+      ],
+      sexta: [
+        { duration: 120, subject: "Ambiental / Consumidor / ECA", mode: "Teoria em rodízio" },
+        { duration: 120, subject: "Direitos Humanos", mode: "Sistema Interamericano + legislação" },
+        { duration: 60, subject: "Difusos / Direitos Humanos", mode: "Questões vinculadas" },
+        { duration: 30, subject: "Informativos de Difusos e Direitos Humanos", mode: "Jurisprudência vinculada" },
+        { duration: 30, subject: "Revisão Difusos", mode: "Revisão vinculada" },
+      ],
+      sabado: [
+        { duration: 120, subject: "Lei Seca Penal", mode: "CP + Lei Penal Especial" },
+        { duration: 120, subject: "Lei Seca Constitucional / CPC", mode: "CF + CPC" },
+        { duration: 60, subject: "Questões Mistas", mode: "Treino vinculado da semana" },
+        { duration: 30, subject: "Informativos da Semana", mode: "Consolidação jurisprudencial" },
+        { duration: 30, subject: "Revisão Geral", mode: "Revisão vinculada" },
+      ],
+      domingo: [
+        { duration: 60, subject: "Informativos", mode: "Leitura leve" },
+        { duration: 60, subject: "Revisão", mode: "Flashcards / marcações" },
+      ],
+    };
+
+    const lawRotation = [
+      { week: 1, items: ["Lei de Drogas", "Crimes Hediondos"] },
+      { week: 2, items: ["Organização Criminosa", "Lavagem de Dinheiro"] },
+      { week: 3, items: ["Abuso de Autoridade", "Maria da Penha"] },
+      { week: 4, items: ["Estatuto do Desarmamento", "Crimes Ambientais"] },
+    ];
+
+    const subjects = [
+      ["Direito Penal", 5],
+      ["Direito Processual Penal", 5],
+      ["Direito Processual Coletivo", 5],
+      ["Direito Processual Civil", 5],
+      ["Direito Constitucional", 4],
+      ["Direito Administrativo", 4],
+      ["Direito Civil", 4],
+      ["Improbidade Administrativa", 4],
+      ["Lei Penal Especial", 4],
+      ["Informativos", 4],
+      ["Teoria Geral do Ministério Público", 4],
+      ["ECA", 3],
+      ["Direito Eleitoral", 3],
+      ["Direito Empresarial", 3],
+      ["Direito Ambiental", 3],
+      ["Direito do Consumidor", 3],
+      ["Execução Penal", 3],
+      ["Jurisprudência de Competência", 3],
+      ["Direito Tributário", 2],
+      ["Direitos Humanos", 2],
+      ["Controle de Constitucionalidade", 2],
+      ["Criminologia", 1],
+    ];
+
+    const dayOrder = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
+    const dayLabel = {
+      domingo: "Domingo",
+      segunda: "Segunda",
+      terca: "Terça",
+      quarta: "Quarta",
+      quinta: "Quinta",
+      sexta: "Sexta",
+      sabado: "Sábado",
+    };
+
+    const state = {
+      selectedDay: getTodayKey(),
+      doneBlocks: [],
+      activeBlock: null,
+      secondsLeft: 0,
+      timerRunning: false,
+      timerInterval: null,
+    };
+
+    const daySelect = document.getElementById('daySelect');
+    const blockList = document.getElementById('blockList');
+    const totalMinutesEl = document.getElementById('totalMinutes');
+    const completedMinutesEl = document.getElementById('completedMinutes');
+    const progressLabel = document.getElementById('progressLabel');
+    const progressFill = document.getElementById('progressFill');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerSubject = document.getElementById('timerSubject');
+    const todayBadge = document.getElementById('todayBadge');
+    const rotationBadge = document.getElementById('rotationBadge');
+    const rotationGrid = document.getElementById('rotationGrid');
+    const currentRotation = document.getElementById('currentRotation');
+    const weightsGrid = document.getElementById('weightsGrid');
+    const notes = document.getElementById('notes');
+
+    function getTodayKey() {
+      return dayOrder[new Date().getDay()];
+    }
+
+    function formatMinutes(mins) {
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      if (h && m) return `${h}h ${m}min`;
+      if (h) return `${h}h`;
+      return `${m}min`;
+    }
+
+    function formatTimer(totalSeconds) {
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function getRotationWeek() {
+      const start = new Date('2026-01-05T00:00:00');
+      const today = new Date();
+      const diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+      return (Math.floor(Math.max(diffDays, 0) / 7) % 4) + 1;
+    }
+
+    function saveState() {
+      const payload = {
+        selectedDay: state.selectedDay,
+        doneBlocks: state.doneBlocks,
+        notes: notes.value,
+        weekGoal: document.getElementById('weekGoal').value
+      };
+      localStorage.setItem('painelEstudosMPMG', JSON.stringify(payload));
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem('painelEstudosMPMG');
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        if (data.selectedDay) state.selectedDay = data.selectedDay;
+        if (Array.isArray(data.doneBlocks)) state.doneBlocks = data.doneBlocks;
+        if (data.notes) notes.value = data.notes;
+        if (data.weekGoal) document.getElementById('weekGoal').value = data.weekGoal;
+      } catch (e) {}
+    }
+
+    function renderDayOptions() {
+      daySelect.innerHTML = dayOrder.map(day => `<option value="${day}">${dayLabel[day]}</option>`).join('');
+      daySelect.value = state.selectedDay;
+    }
+
+    function renderHeader() {
+      todayBadge.textContent = `Hoje: ${dayLabel[getTodayKey()]}`;
+      rotationBadge.textContent = `Rotação penal especial: Semana ${getRotationWeek()}`;
+    }
+
+    function renderBlocks() {
+      const plan = weeklyPlan[state.selectedDay];
+      const total = plan.reduce((sum, item) => sum + item.duration, 0);
+      const completed = state.doneBlocks.reduce((sum, index) => sum + (plan[index] ? plan[index].duration : 0), 0);
+      const progress = total ? Math.round((completed / total) * 100) : 0;
+
+      totalMinutesEl.textContent = formatMinutes(total);
+      completedMinutesEl.textContent = formatMinutes(completed);
+      progressLabel.textContent = `${progress}%`;
+      progressFill.style.width = `${progress}%`;
+
+      blockList.innerHTML = plan.map((block, index) => {
+        const done = state.doneBlocks.includes(index);
+        const active = state.activeBlock === index;
+        return `
+          <div class="block ${done ? 'done' : ''}">
+            <div class="block-header">
+              <div>
+                <div class="mini-badges">
+                  <span class="mini-badge">Bloco ${index + 1}</span>
+                  <span class="mini-badge">${formatMinutes(block.duration)}</span>
+                  ${active ? '<span class="mini-badge" style="background:#e8efff;border-color:#cdddff;color:#1f5eff;">Em andamento</span>' : ''}
+                </div>
+                <h3>${block.subject}</h3>
+                <p>${block.mode}</p>
+              </div>
+              <div class="actions">
+                <button class="btn-primary" onclick="startTimer(${index})">Iniciar</button>
+                <button class="btn-secondary" onclick="toggleDone(${index})">${done ? 'Desmarcar' : 'Marcar feito'}</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderRotation() {
+      const currentWeek = getRotationWeek();
+      rotationGrid.innerHTML = lawRotation.map(item => `
+        <div class="card ${item.week === currentWeek ? 'highlight' : ''}">
+          <h2 class="card-title">Semana ${item.week}</h2>
+          <div class="simple-list">
+            ${item.items.map(name => `<div class="list-item"><span>${name}</span></div>`).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      const current = lawRotation.find(item => item.week === currentWeek);
+      currentRotation.innerHTML = current.items.map(item => `<div class="badge">${item}</div>`).join('');
+    }
+
+    function renderWeights() {
+      const ordered = [...subjects].sort((a, b) => b[1] - a[1]);
+      weightsGrid.innerHTML = ordered.map(([name, weight]) => `
+        <div class="list-item">
+          <span>${name}</span>
+          <span class="mini-badge">Peso ${weight}</span>
+        </div>
+      `).join('');
+    }
+
+    function startTimer(index) {
+      const block = weeklyPlan[state.selectedDay][index];
+      state.activeBlock = index;
+      state.secondsLeft = block.duration * 60;
+      state.timerRunning = true;
+      updateTimerUI();
+      runTimer();
+      renderBlocks();
+    }
+
+    function runTimer() {
+      clearInterval(state.timerInterval);
+      state.timerInterval = setInterval(() => {
+        if (!state.timerRunning) return;
+        if (state.secondsLeft > 0) {
+          state.secondsLeft -= 1;
+          updateTimerUI();
+        } else {
+          state.timerRunning = false;
+          clearInterval(state.timerInterval);
+          updateTimerUI();
+          alert('Tempo encerrado. Bora marcar o bloco como feito e seguir o baile.');
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      timerDisplay.textContent = formatTimer(state.secondsLeft);
+      if (state.activeBlock !== null) {
+        timerSubject.textContent = weeklyPlan[state.selectedDay][state.activeBlock].subject;
+      } else {
+        timerSubject.textContent = 'Escolha um bloco para começar';
+      }
+    }
+
+    function pauseTimer() {
+      state.timerRunning = false;
+    }
+
+    function resumeTimer() {
+      if (state.activeBlock !== null && state.secondsLeft > 0) {
+        state.timerRunning = true;
+      }
+    }
+
+    function resetTimer() {
+      if (state.activeBlock !== null) {
+        state.secondsLeft = weeklyPlan[state.selectedDay][state.activeBlock].duration * 60;
+        state.timerRunning = false;
+        updateTimerUI();
+      }
+    }
+
+    function toggleDone(index) {
+      if (state.doneBlocks.includes(index)) {
+        state.doneBlocks = state.doneBlocks.filter(i => i !== index);
+      } else {
+        state.doneBlocks.push(index);
+      }
+      saveState();
+      renderBlocks();
+    }
+
+    function clearDay() {
+      state.doneBlocks = [];
+      state.activeBlock = null;
+      state.secondsLeft = 0;
+      state.timerRunning = false;
+      clearInterval(state.timerInterval);
+      updateTimerUI();
+      saveState();
+      renderBlocks();
+    }
+
+    function setupTabs() {
+      const buttons = document.querySelectorAll('.tab-btn');
+      const contents = document.querySelectorAll('.tab-content');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          buttons.forEach(b => b.classList.remove('active'));
+          contents.forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+        });
+      });
+    }
+
+    document.getElementById('pauseBtn').addEventListener('click', pauseTimer);
+    document.getElementById('resumeBtn').addEventListener('click', resumeTimer);
+    document.getElementById('resetBtn').addEventListener('click', resetTimer);
+    document.getElementById('clearBtn').addEventListener('click', clearDay);
+    document.getElementById('weekGoal').addEventListener('input', saveState);
+    notes.addEventListener('input', saveState);
+
+    daySelect.addEventListener('change', (e) => {
+      state.selectedDay = e.target.value;
+      state.doneBlocks = [];
+      state.activeBlock = null;
+      state.secondsLeft = 0;
+      state.timerRunning = false;
+      clearInterval(state.timerInterval);
+      updateTimerUI();
+      saveState();
+      renderBlocks();
+    });
+
+    loadState();
+    renderDayOptions();
+    renderHeader();
+    renderBlocks();
+    renderRotation();
+    renderWeights();
+    updateTimerUI();
+    setupTabs();
+
+    window.startTimer = startTimer;
+    window.toggleDone = toggleDone;
+  </script>
+</body>
+</html>
