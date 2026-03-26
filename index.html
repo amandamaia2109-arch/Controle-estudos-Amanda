@@ -463,6 +463,7 @@
       <button class="tab-btn" data-tab="pesos">Pesos</button>
       <button class="tab-btn" data-tab="anotacoes">Anotações</button>
       <button class="tab-btn" data-tab="estrategia">Estratégia</button>
+      <button class="tab-btn" data-tab="feedback">Feedback</button>
     </div>
 
     <div class="tab-content active" id="tab-rotacao">
@@ -487,26 +488,40 @@
       </div>
     </div>
 
-    <div class="tab-content" id="tab-estrategia">
+    <div class="tab-content" id="tab-estrategia">$1</div>
+
+    <div class="tab-content" id="tab-feedback">
       <div class="grid-2">
         <div class="card">
-          <h2 class="card-title">Proporção ideal</h2>
-          <div class="simple-list">
-            <div class="list-item"><span>50% teoria vinculada à matéria</span></div>
-            <div class="list-item"><span>20% jurisprudência / informativos vinculados</span></div>
-            <div class="list-item"><span>20% lei seca vinculada</span></div>
-            <div class="list-item"><span>10% revisão vinculada</span></div>
+          <h2 class="card-title">Resumo da semana</h2>
+          <div class="stats" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 0;">
+            <div class="stat-box">
+              <div class="stat-label">Horas estudadas</div>
+              <div class="stat-value" id="weeklyHours">0h</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">Blocos concluídos</div>
+              <div class="stat-value" id="weeklyBlocks">0</div>
+            </div>
           </div>
+          <div class="small" style="margin-top:12px;">Esse quadro soma os blocos que você marcou como feitos ao longo da semana.</div>
         </div>
         <div class="card">
-          <h2 class="card-title">Regra de execução</h2>
-          <div class="simple-list">
-            <div class="list-item"><span>Questões sempre vinculadas à matéria do dia.</span></div>
-            <div class="list-item"><span>Lei penal especial com peso 4 e rotação semanal.</span></div>
-            <div class="list-item"><span>Sábado é consolidação pesada; domingo é manutenção leve.</span></div>
-            <div class="list-item"><span>Nada de “lei seca genérica”: sempre matéria + lei correspondente.</span></div>
+          <h2 class="card-title">Meta semanal</h2>
+          <div class="progress-wrap" style="margin-bottom:0;">
+            <div class="progress-top">
+              <span>Progresso da meta</span>
+              <span id="weeklyGoalLabel">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="weeklyGoalFill"></div></div>
           </div>
+          <div class="small" style="margin-top:12px;">Meta baseada no campo de horas semanais lá em cima. Sem choro, só números.</div>
         </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h2 class="card-title">Horas por matéria</h2>
+        <div class="simple-list" id="subjectFeedbackList"></div>
       </div>
     </div>
   </div>
@@ -605,6 +620,7 @@
     };
 
     const state = {
+      weeklyHistory: {},
       selectedDay: getTodayKey(),
       doneBlocks: [],
       activeBlock: null,
@@ -653,12 +669,24 @@
       return (Math.floor(Math.max(diffDays, 0) / 7) % 4) + 1;
     }
 
+    function getWeekKey(date = new Date()) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const dayNum = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${dayNum}`;
+    }
+
     function saveState() {
       const payload = {
         selectedDay: state.selectedDay,
         doneBlocks: state.doneBlocks,
         notes: notes.value,
-        weekGoal: document.getElementById('weekGoal').value
+        weekGoal: document.getElementById('weekGoal').value,
+        weeklyHistory: state.weeklyHistory || {}
       };
       localStorage.setItem('painelEstudosMPMG', JSON.stringify(payload));
     }
@@ -672,6 +700,7 @@
         if (Array.isArray(data.doneBlocks)) state.doneBlocks = data.doneBlocks;
         if (data.notes) notes.value = data.notes;
         if (data.weekGoal) document.getElementById('weekGoal').value = data.weekGoal;
+        if (data.weeklyHistory && typeof data.weeklyHistory === 'object') state.weeklyHistory = data.weeklyHistory;
       } catch (e) {}
     }
 
@@ -799,17 +828,63 @@
       }
     }
 
+    function updateWeeklyHistory(dayKey, block, add) {
+      const weekKey = getWeekKey();
+      if (!state.weeklyHistory[weekKey]) {
+        state.weeklyHistory[weekKey] = { totalMinutes: 0, blocks: 0, subjects: {} };
+      }
+      const entry = state.weeklyHistory[weekKey];
+      const delta = add ? block.duration : -block.duration;
+      entry.totalMinutes = Math.max(0, (entry.totalMinutes || 0) + delta);
+      entry.blocks = Math.max(0, (entry.blocks || 0) + (add ? 1 : -1));
+      entry.subjects[block.subject] = Math.max(0, (entry.subjects[block.subject] || 0) + delta);
+      if (entry.subjects[block.subject] === 0) delete entry.subjects[block.subject];
+    }
+
+    function renderFeedback() {
+      const weekKey = getWeekKey();
+      const data = state.weeklyHistory[weekKey] || { totalMinutes: 0, blocks: 0, subjects: {} };
+      const goal = Number(document.getElementById('weekGoal').value || 0) * 60;
+      const pct = goal ? Math.min(100, Math.round((data.totalMinutes / goal) * 100)) : 0;
+      document.getElementById('weeklyHours').textContent = formatMinutes(data.totalMinutes);
+      document.getElementById('weeklyBlocks').textContent = String(data.blocks || 0);
+      document.getElementById('weeklyGoalLabel').textContent = `${pct}%`;
+      document.getElementById('weeklyGoalFill').style.width = `${pct}%`;
+
+      const list = document.getElementById('subjectFeedbackList');
+      const ordered = Object.entries(data.subjects || {}).sort((a, b) => b[1] - a[1]);
+      if (!ordered.length) {
+        list.innerHTML = '<div class="list-item"><span>Nenhuma matéria contabilizada ainda.</span><span class="small">Comece marcando os blocos como feitos.</span></div>';
+        return;
+      }
+      list.innerHTML = ordered.map(([subject, minutes]) => `
+        <div class="list-item">
+          <span>${subject}</span>
+          <span class="mini-badge">${formatMinutes(minutes)}</span>
+        </div>
+      `).join('');
+    }
+
     function toggleDone(index) {
+      const block = weeklyPlan[state.selectedDay][index];
       if (state.doneBlocks.includes(index)) {
         state.doneBlocks = state.doneBlocks.filter(i => i !== index);
+        updateWeeklyHistory(state.selectedDay, block, false);
       } else {
         state.doneBlocks.push(index);
+        updateWeeklyHistory(state.selectedDay, block, true);
       }
       saveState();
       renderBlocks();
+      renderFeedback();
     }
 
     function clearDay() {
+      const plan = weeklyPlan[state.selectedDay];
+      state.doneBlocks.forEach(index => {
+        const block = plan[index];
+        if (block) updateWeeklyHistory(state.selectedDay, block, false);
+      });
       state.doneBlocks = [];
       state.activeBlock = null;
       state.secondsLeft = 0;
@@ -818,6 +893,7 @@
       updateTimerUI();
       saveState();
       renderBlocks();
+      renderFeedback();
     }
 
     function setupTabs() {
@@ -837,7 +913,7 @@
     document.getElementById('resumeBtn').addEventListener('click', resumeTimer);
     document.getElementById('resetBtn').addEventListener('click', resetTimer);
     document.getElementById('clearBtn').addEventListener('click', clearDay);
-    document.getElementById('weekGoal').addEventListener('input', saveState);
+    document.getElementById('weekGoal').addEventListener('input', () => { saveState(); renderFeedback(); });
     notes.addEventListener('input', saveState);
 
     daySelect.addEventListener('change', (e) => {
@@ -858,6 +934,7 @@
     renderBlocks();
     renderRotation();
     renderWeights();
+    renderFeedback();
     updateTimerUI();
     setupTabs();
 
